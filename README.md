@@ -1,0 +1,1 @@
+amall is a mall which come from taobao.com

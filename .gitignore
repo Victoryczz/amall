@@ -1,0 +1,25 @@
+*.class
+
+#package file
+*.war
+*.ear
+
+#marven ignore
+target/
+
+#idea
+.idea/
+/idea/
+*.ipr
+*.iml
+*.iws
+
+#tmpfile
+*.log
+*.cache
+*.patch
+*.tmp
+
+#system ignore
+.DS_Store
+Thumbs.db
