@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSession;
  */
 @Controller
 @RequestMapping(value = "/manage/user/")
-public class UserManagerController {
+public class UserManageController {
 
     @Autowired
     private IUserService iUserService;
