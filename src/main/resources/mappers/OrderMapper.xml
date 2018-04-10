@@ -198,4 +198,32 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="selectByUserIdAndOrderNo" parameterType="map" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM amall_order
+    WHERE user_id = #{userId}
+    AND order_no = #{orderNo}
+  </select>
+  <select id="selectByOrderNo" parameterType="long" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM amall_order
+    WHERE order_no = #{orderNo}
+  </select>
+  <select id="selectOrderByUserId" parameterType="int" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM amall_order
+    WHERE user_id = #{userId}
+    ORDER BY create_time DESC
+  </select>
+
+  <select id="selectAllOrder" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM amall_order
+    ORDER BY create_time DESC
+  </select>
+
 </mapper>
