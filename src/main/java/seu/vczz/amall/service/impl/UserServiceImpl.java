@@ -42,7 +42,7 @@ public class UserServiceImpl implements IUserService{
             return ServerResponse.createByErrorMessage("密码错误");
         //如果获得了用户，那么就将用户密码置空，然后返回
         user.setPassword(StringUtils.EMPTY);
-        //返回json序列化
+        //返回json序列化,此时已经返回了user，所以也拿到了userId
         return ServerResponse.createBySuccess("登录成功", user);
     }
 
