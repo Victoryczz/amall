@@ -20,7 +20,7 @@ import java.util.Set;
  * CREATE by vczz on 2018/4/9
  * 分类管理服务实现
  */
-@Service
+@Service("iCategoryService")
 public class CategoryServiceImpl implements ICategoryService {
     //日志
     private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
