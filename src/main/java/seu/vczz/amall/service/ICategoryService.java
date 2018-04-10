@@ -11,12 +11,34 @@ import java.util.List;
  */
 public interface ICategoryService {
 
+    /**
+     * 添加分类
+     * @param categoryName
+     * @param parentId
+     * @return
+     */
     ServerResponse addCategory(String categoryName, Integer parentId);
 
+    /**
+     * 更新分类名称
+     * @param categoryId
+     * @param categoryName
+     * @return
+     */
     ServerResponse updateCategoryName(Integer categoryId, String categoryName);
 
+    /**
+     * 获得当前分类的子分类
+     * @param categoryId
+     * @return
+     */
     ServerResponse<List<Category>> getChildrenParallelCategory(Integer categoryId);
 
+    /**
+     * 递归查询子分类
+     * @param categoryId
+     * @return
+     */
     ServerResponse<List<Integer>> getCategoryAndChildrenById(Integer categoryId);
 
 }
