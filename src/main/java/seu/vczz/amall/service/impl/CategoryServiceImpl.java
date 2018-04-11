@@ -2,6 +2,7 @@ package seu.vczz.amall.service.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -21,9 +22,10 @@ import java.util.Set;
  * 分类管理服务实现
  */
 @Service("iCategoryService")
+@Slf4j
 public class CategoryServiceImpl implements ICategoryService {
-    //日志
-    private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
+    //日志,注释掉使用lombok注解
+    //private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     @Autowired
     private CategoryMapper categoryMapper;
@@ -81,7 +83,7 @@ public class CategoryServiceImpl implements ICategoryService {
         //根据分类id，查询所有以该id为父类id的分类
         List<Category> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
         if (CollectionUtils.isEmpty(categoryList)){
-            logger.info("未找到当亲分类的子分类");
+            log.info("未找到当亲分类的子分类");//这是因为使用lombok @slf4j注解
         }
         return ServerResponse.createBySuccess(categoryList);
     }

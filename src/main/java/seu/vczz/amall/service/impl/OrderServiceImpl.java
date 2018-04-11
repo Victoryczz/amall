@@ -14,6 +14,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -43,9 +44,10 @@ import java.util.*;
  * CREATE by vczz on 2018/4/10
  */
 @Service("iOrderService")
+@Slf4j
 public class OrderServiceImpl implements IOrderService {
     //日志
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
+    //private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
     //当面付。从支付宝demo中拿过来
     private static AlipayTradeService tradeService;
     //从支付宝demo中拿过来
@@ -520,7 +522,7 @@ public class OrderServiceImpl implements IOrderService {
         AlipayF2FPrecreateResult result = tradeService.tradePrecreate(builder);
         switch (result.getTradeStatus()) {
             case SUCCESS:
-                LOGGER.info("支付宝预下单成功: )");
+                log.info("支付宝预下单成功: )");
                 AlipayTradePrecreateResponse response = result.getResponse();
                 dumpResponse(response);//简单打印响应
 
@@ -542,10 +544,10 @@ public class OrderServiceImpl implements IOrderService {
                     //上传至ftp
                     FTPUtil.uploadFile(Lists.newArrayList(targetFile));
                 } catch (IOException e) {
-                    LOGGER.error("上传二维码异常",e);
+                    log.error("上传二维码异常",e);
                     e.printStackTrace();
                 }
-                LOGGER.info("qrPath:" + qrPath);
+                log.info("qrPath:" + qrPath);
                 //需要返回给前端的二维码路径
                 String qrUrl = PropertiesUtil.getProperty("ftp.server.http.prefix")+targetFile.getName();
                 //再将qrUrl放到map中
@@ -553,27 +555,27 @@ public class OrderServiceImpl implements IOrderService {
                 return ServerResponse.createBySuccess(resultMap);
 
             case FAILED:
-                LOGGER.error("支付宝预下单失败!!!");
+                log.error("支付宝预下单失败!!!");
                 return ServerResponse.createByErrorMessage("支付宝预下单失败");
 
             case UNKNOWN:
-                LOGGER.error("系统异常，预下单状态未知!!!");
+                log.error("系统异常，预下单状态未知!!!");
                 return ServerResponse.createByErrorMessage("系统异常，预下单状态未知!!!");
 
             default:
-                LOGGER.error("不支持的交易状态，交易返回异常!!!");
+                log.error("不支持的交易状态，交易返回异常!!!");
                 return ServerResponse.createByErrorMessage("不支持的交易状态，交易返回异常!!!");
         }
     }
     // 简单打印应答
     private void dumpResponse(AlipayResponse response) {
         if (response != null) {
-            LOGGER.info(String.format("code:%s, msg:%s", response.getCode(), response.getMsg()));
+            log.info(String.format("code:%s, msg:%s", response.getCode(), response.getMsg()));
             if (StringUtils.isNotEmpty(response.getSubCode())) {
-                LOGGER.info(String.format("subCode:%s, subMsg:%s", response.getSubCode(),
+                log.info(String.format("subCode:%s, subMsg:%s", response.getSubCode(),
                         response.getSubMsg()));
             }
-            LOGGER.info("body:" + response.getBody());
+            log.info("body:" + response.getBody());
         }
     }
 
@@ -587,7 +589,7 @@ public class OrderServiceImpl implements IOrderService {
         Long orderNo = Long.parseLong(params.get("out_trade_no"));//交易订单号
         String tradeNo = params.get("trade_no");//支付宝交易号
         String tradeStatus = params.get("trade_status");
-        LOGGER.info("支付宝交易状态："+tradeStatus);
+        log.info("支付宝交易状态："+tradeStatus);
         Order order = orderMapper.selectByOrderNo(orderNo);
         if (order == null){
             return ServerResponse.createByErrorMessage("非mmall商城的订单,忽略回调");

@@ -1,6 +1,7 @@
 package seu.vczz.amall.service.impl;
 
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,9 +17,10 @@ import java.util.UUID;
  * CREATE by vczz on 2018/4/9
  */
 @Service("iFileService")
+@Slf4j
 public class FileServiceImpl implements IFileService {
 
-    private Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
+    //private Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
     /**
      * 上传文件，同时传到ftp之后再删除文件
@@ -34,7 +36,7 @@ public class FileServiceImpl implements IFileService {
         String fileExtensionName = fileName.substring(fileName.lastIndexOf(".")+1);
         //上传文件文件名，使用UUID
         String uploadFileName = UUID.randomUUID().toString()+"."+fileExtensionName;
-        logger.info("开始上传文件,上传文件名:{},上传路径:{},新文件名:{}",fileName, path, uploadFileName);
+        log.info("开始上传文件,上传文件名:{},上传路径:{},新文件名:{}",fileName, path, uploadFileName);
 
         File fileDir = new File(path);
         //判断路径是否存在，不存在则创建
@@ -52,7 +54,7 @@ public class FileServiceImpl implements IFileService {
             //删除webapp下的文件
             targetFile.delete();
         } catch (IOException e) {
-            logger.error("上传文件异常", e);
+            log.error("上传文件异常", e);
             return null;
         }
         //这一步证明了虽然文件不在了，但是还是能获取名字，在出了作用域之后就不行了
