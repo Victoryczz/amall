@@ -286,5 +286,50 @@
       </plugin>
     </plugins>
 
+    <!--maven环境隔离配置-->
+    <resources>
+      <resource>
+        <!--不同环境需要的配置文件-->
+        <directory>src/main/resources.${deploy.type}</directory>
+        <excludes>
+          <exclude>*.jsp</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <!--公共配置文件-->
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+
   </build>
+  <!--maven环境隔离配置-->
+  <profiles>
+    <!--开发环境-->
+    <profile>
+      <id>dev</id>
+      <activation>
+        <!--默认的生产环境-->
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <!--与前面命名的deploy.type同名必须-->
+        <deploy.type>dev</deploy.type>
+      </properties>
+    </profile>
+    <!--beta测试环境-->
+    <profile>
+      <id>beta</id>
+      <properties>
+        <deploy.type>beta</deploy.type>
+      </properties>
+    </profile>
+    <!--线上环境-->
+    <profile>
+      <id>prod</id>
+      <properties>
+        <deploy.type>prod</deploy.type>
+      </properties>
+    </profile>
+  </profiles>
+
 </project>
