@@ -1,5 +1,6 @@
 package seu.vczz.amall.util;
 
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
@@ -10,6 +11,7 @@ import org.codehaus.jackson.type.JavaType;
 import org.codehaus.jackson.type.TypeReference;
 import seu.vczz.amall.pojo.User;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 
 /**
@@ -145,7 +147,11 @@ public class JsonUtil {
         user1.setId(1);
         user1.setUsername("vczz");
 
-        //序列化一下user1
+        User user2 = new User();
+        user2.setId(2);
+        user2.setUsername("smj");
+
+        /*//序列化一下user1
         String user1Str = JsonUtil.obj2String(user1);
         String user1PrettyStr = JsonUtil.obj2StringPretty(user1);
         //打印
@@ -153,8 +159,19 @@ public class JsonUtil {
         log.info(user1PrettyStr);
         //反序列化一下
         User user = JsonUtil.string2Obj(user1Str, User.class);
+        System.out.println("end");*/
+        //序列化
+        String user1Str = JsonUtil.obj2String(user1);
+        String user2Str = JsonUtil.obj2String(user2);
+        List<User> userList = Lists.newArrayList();
+        userList.add(user1);
+        userList.add(user2);
+        String userListStr = JsonUtil.obj2StringPretty(userList);
+        log.info(userListStr);
 
-        System.out.println("end");
+        List<User> users = JsonUtil.string2Obj(userListStr, new TypeReference<List<User>>(){
+        });
+
 
     }
 
