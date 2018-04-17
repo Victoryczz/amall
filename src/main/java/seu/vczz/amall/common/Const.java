@@ -45,7 +45,6 @@ public class Const {
             this.value = value;
 
         }
-
         public String getValue() {
             return value;
         }
@@ -63,7 +62,6 @@ public class Const {
         SHIPPED(40, "已发货"),
         ORDER_SUCCESS(50, "订单完成"),
         ORDER_CLOSED(60, "订单关闭");
-
 
         private int code;
         private String value;
@@ -90,7 +88,6 @@ public class Const {
             }
             throw new RuntimeException("找不到枚举");
         }
-
     }
     //只使用常量的话就用interface，上面每个有两个值用了enum
     public interface AlipayCallback{
@@ -99,7 +96,6 @@ public class Const {
 
         String RESPONSE_SUCCESS = "success";
         String RESPONSE_FAILED = "failed";
-
     }
     //交易平台
     public enum PayPlatformEnum{
@@ -153,9 +149,13 @@ public class Const {
             }
             throw  new RuntimeException("没有找到相应的枚举");
         }
-
+    }
+    //redis缓存时间
+    public interface RedisCacheExtime{
+        int REDIS_SESSION_EXTIME = 60*30;//30min
 
     }
+
 
 
 }
