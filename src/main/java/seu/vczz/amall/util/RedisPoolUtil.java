@@ -52,6 +52,7 @@ public class RedisPoolUtil {
         try {
             jedis = RedisPool.getResource();
             result = jedis.setex(key, exTime, value);
+            log.info("setex key:{} value:{} extime:{}", key, value, exTime);
         } catch (Exception e) {
             //打印错误信息
             log.error("setex key:{} value:{} extime:{} error", key, value, exTime, e);

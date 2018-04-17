@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class CookieUtil {
     //domain意思是范围，领域；代表cookie的范围，当前代表只要域名是.amall.com下的二级域名都可以使用该cookie
-    private final static String COOKIE_DOMAIN = ".amall.com";
+    private final static String COOKIE_DOMAIN = "amall.com";
     //cookie的名字
     private final static String COOKIE_NAME = "amall_login_token";
 
@@ -31,10 +31,11 @@ public class CookieUtil {
         //该设置和domain是一一对应的，url分为domain和path两个部分，都代表其他地址是否能够访问到的cookie
         cookie.setPath("/");
         //单位是秒，设置为-1代表永久有效，当不设置该属性，则不会写入硬盘，而是写在内存，只在当前浏览器有效，关闭即失效
-        cookie.setMaxAge(-1);
+        cookie.setMaxAge(60*60*24);
         //防止脚本攻击
         cookie.setHttpOnly(true);
         log.info("write cookieName:{}, cookieValue:{}", cookie.getName(), cookie.getValue());
+        //由于使用了tomcat9，所以这里一直报错，是由于tomcat8.5之后domain规则改变导致的
         response.addCookie(cookie);
     }
 
