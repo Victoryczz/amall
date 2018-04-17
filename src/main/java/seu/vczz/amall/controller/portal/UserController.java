@@ -10,9 +10,11 @@ import seu.vczz.amall.common.ResponseCode;
 import seu.vczz.amall.common.ServerResponse;
 import seu.vczz.amall.pojo.User;
 import seu.vczz.amall.service.IUserService;
+import seu.vczz.amall.util.CookieUtil;
 import seu.vczz.amall.util.JsonUtil;
 import seu.vczz.amall.util.RedisPoolUtil;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -35,14 +37,16 @@ public class UserController {
      */
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> login(String username, String password, HttpSession httpSession){
+    public ServerResponse<User> login(String username, String password, HttpSession httpSession, HttpServletResponse response){
         //-->service-->dao
         //获取服务返回
         ServerResponse<User> serverResponse =  iUserService.login(username, password);
         //如果用户存在,放进session
         if (serverResponse.isSuccess()){
-            //httpSession.setAttribute(Const.CURRENT_USER, serverResponse.getData());
+            //httpSession.setAttribute(Const.CURRENT_USER, serverResponse.getData());  v1.0
             //如果登录成功，直接将session放到redis中
+            CookieUtil.writeLoginToken(response, httpSession.getId());
+
             RedisPoolUtil.setEx(httpSession.getId(), JsonUtil.obj2String(serverResponse.getData()), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
         }
         return serverResponse;
