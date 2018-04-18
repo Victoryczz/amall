@@ -10,6 +10,7 @@ import seu.vczz.amall.dao.UserMapper;
 import seu.vczz.amall.pojo.User;
 import seu.vczz.amall.service.IUserService;
 import seu.vczz.amall.util.MD5Util;
+import seu.vczz.amall.util.RedisPoolUtil;
 
 import java.util.UUID;
 
@@ -138,7 +139,11 @@ public class UserServiceImpl implements IUserService{
         if (resultCount > 0){
             //根据UUID生成token，并将token返回,如果token失效了，就过了改密码的时间
             String forgetToken = UUID.randomUUID().toString();
-            TokenCache.setKey(TokenCache.TOKEN_PREFIX+username, forgetToken);
+            //在这里重构tokenCache，因为已经使用了集群，而这个tokenCache是本地cache
+            //TokenCache.setKey(TokenCache.TOKEN_PREFIX+username, forgetToken);
+            //将tokenCache放到redis中
+            RedisPoolUtil.setEx(Const.TOKEN_PREFIX+username, forgetToken, 60*60*12);
+
             return ServerResponse.createBySuccess(forgetToken);
         }
         return ServerResponse.createByErrorMessage("答案错误");
@@ -163,7 +168,10 @@ public class UserServiceImpl implements IUserService{
             return ServerResponse.createByErrorMessage("用户名不存在");
         }
         //判断token是否失效
-        String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX+username);
+        //重构，使用redis
+        //String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX+username);
+        String token = RedisPoolUtil.get(Const.TOKEN_PREFIX+username);
+
         if (StringUtils.isBlank(token)){
             return ServerResponse.createByErrorMessage("有效期已过，请重新修改");
         }

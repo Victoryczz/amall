@@ -13,6 +13,8 @@ public class Const {
     //实时校验时的type
     public static final String EMAIL = "email";
     public static final String USERNAME = "username";
+    public static final String TOKEN_PREFIX = "token_";
+
     //查询产品列表排序传入的字符串，升序、降序
     public interface ProductListOrderBy{
         Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_desc", "price_asc");
