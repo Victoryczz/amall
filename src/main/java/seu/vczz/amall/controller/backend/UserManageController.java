@@ -12,7 +12,8 @@ import seu.vczz.amall.pojo.User;
 import seu.vczz.amall.service.IUserService;
 import seu.vczz.amall.util.CookieUtil;
 import seu.vczz.amall.util.JsonUtil;
-import seu.vczz.amall.util.RedisPoolUtil;
+import seu.vczz.amall.util.RedisShardedPoolUtil;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -49,7 +50,7 @@ public class UserManageController {
                 //登录成功则放进去
                 //如果登录成功，直接将session放到redis中
                 CookieUtil.writeLoginToken(response, session.getId());
-                RedisPoolUtil.setEx(session.getId(), JsonUtil.obj2String(user), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+                RedisShardedPoolUtil.setEx(session.getId(), JsonUtil.obj2String(user), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
 
 
                 return serverResponse;

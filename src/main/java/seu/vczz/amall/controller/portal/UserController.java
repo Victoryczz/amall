@@ -13,7 +13,7 @@ import seu.vczz.amall.pojo.User;
 import seu.vczz.amall.service.IUserService;
 import seu.vczz.amall.util.CookieUtil;
 import seu.vczz.amall.util.JsonUtil;
-import seu.vczz.amall.util.RedisPoolUtil;
+import seu.vczz.amall.util.RedisShardedPoolUtil;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -48,7 +48,7 @@ public class UserController {
             //如果登录成功，直接将session放到redis中
             CookieUtil.writeLoginToken(response, httpSession.getId());
 
-            RedisPoolUtil.setEx(httpSession.getId(), JsonUtil.obj2String(serverResponse.getData()), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+            RedisShardedPoolUtil.setEx(httpSession.getId(), JsonUtil.obj2String(serverResponse.getData()), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
         }
         return serverResponse;
     }
@@ -66,7 +66,7 @@ public class UserController {
         //直接先删除cookie
         CookieUtil.delLoginToken(request, response);
         //在删除redis
-        RedisPoolUtil.del(loginToken);
+        RedisShardedPoolUtil.del(loginToken);
 
         return ServerResponse.createBySuccess();
     }
@@ -106,7 +106,7 @@ public class UserController {
         if (loginToken == null){
             return ServerResponse.createByErrorMessage("用户未登录，不能获取用户信息");
         }
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
         //感觉重构麻烦了
         if (user != null)
@@ -165,7 +165,7 @@ public class UserController {
             return ServerResponse.createByErrorMessage("用户未登录,不能重置密码");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
@@ -191,7 +191,7 @@ public class UserController {
             return ServerResponse.createByErrorMessage("用户未登录,不能更新信息");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User currentUser = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -206,7 +206,7 @@ public class UserController {
             //少了这一句
             serverResponse.getData().setUsername(currentUser.getUsername());
             //session.setAttribute(Const.CURRENT_USER, serverResponse.getData());
-            RedisPoolUtil.setEx(loginToken, JsonUtil.obj2String(serverResponse.getData()), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+            RedisShardedPoolUtil.setEx(loginToken, JsonUtil.obj2String(serverResponse.getData()), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
 
         }
         return serverResponse;
@@ -228,7 +228,7 @@ public class UserController {
             return ServerResponse.createByErrorMessage("用户未登录,不能获取用户信息");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 

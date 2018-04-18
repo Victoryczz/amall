@@ -5,12 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import seu.vczz.amall.common.Const;
 import seu.vczz.amall.common.ServerResponse;
-import seu.vczz.amall.common.TokenCache;
 import seu.vczz.amall.dao.UserMapper;
 import seu.vczz.amall.pojo.User;
 import seu.vczz.amall.service.IUserService;
 import seu.vczz.amall.util.MD5Util;
-import seu.vczz.amall.util.RedisPoolUtil;
+import seu.vczz.amall.util.RedisShardedPoolUtil;
 
 import java.util.UUID;
 
@@ -142,7 +141,7 @@ public class UserServiceImpl implements IUserService{
             //在这里重构tokenCache，因为已经使用了集群，而这个tokenCache是本地cache
             //TokenCache.setKey(TokenCache.TOKEN_PREFIX+username, forgetToken);
             //将tokenCache放到redis中
-            RedisPoolUtil.setEx(Const.TOKEN_PREFIX+username, forgetToken, 60*60*12);
+            RedisShardedPoolUtil.setEx(Const.TOKEN_PREFIX+username, forgetToken, 60*60*12);
 
             return ServerResponse.createBySuccess(forgetToken);
         }
@@ -170,7 +169,7 @@ public class UserServiceImpl implements IUserService{
         //判断token是否失效
         //重构，使用redis
         //String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX+username);
-        String token = RedisPoolUtil.get(Const.TOKEN_PREFIX+username);
+        String token = RedisShardedPoolUtil.get(Const.TOKEN_PREFIX+username);
 
         if (StringUtils.isBlank(token)){
             return ServerResponse.createByErrorMessage("有效期已过，请重新修改");

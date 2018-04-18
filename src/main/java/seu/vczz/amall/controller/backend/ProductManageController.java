@@ -15,10 +15,8 @@ import seu.vczz.amall.pojo.User;
 import seu.vczz.amall.service.IFileService;
 import seu.vczz.amall.service.IProductService;
 import seu.vczz.amall.service.IUserService;
-import seu.vczz.amall.util.CookieUtil;
-import seu.vczz.amall.util.JsonUtil;
-import seu.vczz.amall.util.PropertiesUtil;
-import seu.vczz.amall.util.RedisPoolUtil;
+import seu.vczz.amall.util.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -57,7 +55,7 @@ public class ProductManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能新增产品");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -90,7 +88,7 @@ public class ProductManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能设置产品状态");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -122,7 +120,7 @@ public class ProductManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能获取产品详情");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -156,7 +154,7 @@ public class ProductManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能获取产品列表");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -193,7 +191,7 @@ public class ProductManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能查找产品");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -225,7 +223,7 @@ public class ProductManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能上传文件");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -271,7 +269,7 @@ public class ProductManageController {
             return resultMap;
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 

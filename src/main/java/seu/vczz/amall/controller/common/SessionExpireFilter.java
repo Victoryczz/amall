@@ -5,7 +5,7 @@ import seu.vczz.amall.common.Const;
 import seu.vczz.amall.pojo.User;
 import seu.vczz.amall.util.CookieUtil;
 import seu.vczz.amall.util.JsonUtil;
-import seu.vczz.amall.util.RedisPoolUtil;
+import seu.vczz.amall.util.RedisShardedPoolUtil;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -32,12 +32,12 @@ public class SessionExpireFilter implements Filter {
 
         if (StringUtils.isNotEmpty(loginToken)){
             //如果loginToken不为空，则取出user信息
-            String userJsonStr = RedisPoolUtil.get(loginToken);
+            String userJsonStr = RedisShardedPoolUtil.get(loginToken);
             //拿到user
             User user = JsonUtil.string2Obj(userJsonStr, User.class);
             if (user != null){
                 //如果user不为空，则重新设置sessionId--user的时间
-                RedisPoolUtil.expire(loginToken, Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+                RedisShardedPoolUtil.expire(loginToken, Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
             }
         }
         filterChain.doFilter(servletRequest, servletResponse);

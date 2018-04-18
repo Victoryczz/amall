@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import seu.vczz.amall.common.Const;
 import seu.vczz.amall.common.ResponseCode;
 import seu.vczz.amall.common.ServerResponse;
 import seu.vczz.amall.pojo.User;
@@ -13,7 +14,8 @@ import seu.vczz.amall.service.ICategoryService;
 import seu.vczz.amall.service.IUserService;
 import seu.vczz.amall.util.CookieUtil;
 import seu.vczz.amall.util.JsonUtil;
-import seu.vczz.amall.util.RedisPoolUtil;
+import seu.vczz.amall.util.RedisShardedPoolUtil;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -49,7 +51,7 @@ public class CategoryManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能添加分类");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -83,7 +85,7 @@ public class CategoryManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能修改分类名称");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -116,7 +118,7 @@ public class CategoryManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能获取子分类目录");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -147,7 +149,7 @@ public class CategoryManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能获取分类目录");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 

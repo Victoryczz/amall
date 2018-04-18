@@ -13,7 +13,8 @@ import seu.vczz.amall.service.IOrderService;
 import seu.vczz.amall.service.IUserService;
 import seu.vczz.amall.util.CookieUtil;
 import seu.vczz.amall.util.JsonUtil;
-import seu.vczz.amall.util.RedisPoolUtil;
+import seu.vczz.amall.util.RedisShardedPoolUtil;
+
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -52,7 +53,7 @@ public class OrderManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能获取订单列表");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -85,7 +86,7 @@ public class OrderManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能获取订单详情");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -120,7 +121,7 @@ public class OrderManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能搜寻订单");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
@@ -152,7 +153,7 @@ public class OrderManageController {
             return ServerResponse.createByErrorMessage("用户未登录,不能发货");
         }
         //拿到用户信息
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         //转user
         User user = JsonUtil.string2Obj(userJsonStr, User.class);
 
