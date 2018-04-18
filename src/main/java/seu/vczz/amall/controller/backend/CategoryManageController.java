@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import seu.vczz.amall.common.Const;
 import seu.vczz.amall.common.ResponseCode;
 import seu.vczz.amall.common.ServerResponse;
 import seu.vczz.amall.pojo.User;
