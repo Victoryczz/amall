@@ -14,6 +14,7 @@ import seu.vczz.amall.util.CookieUtil;
 import seu.vczz.amall.util.JsonUtil;
 import seu.vczz.amall.util.RedisPoolUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -54,14 +55,20 @@ public class UserController {
 
     /**
      * 用户登出，只需要移除session即可
-     * @param httpSession
+     * @param
      * @return
      */
     @RequestMapping(value = "logout.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> logout(HttpSession httpSession){
+    public ServerResponse<User> logout(HttpServletRequest request, HttpServletResponse response){
         //移除session的属性
-        httpSession.removeAttribute(Const.CURRENT_USER);
+        //httpSession.removeAttribute(Const.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        //直接先删除cookie
+        CookieUtil.delLoginToken(request, response);
+        //在删除redis
+        RedisPoolUtil.del(loginToken);
+
         return ServerResponse.createBySuccess();
     }
 
@@ -91,13 +98,21 @@ public class UserController {
 
     /**
      * 获取用户信息
-     * @param session
+     * @param request 请求
      * @return
      */
     @RequestMapping(value = "get_user_info.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> getUserInfo(HttpSession session){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<User> getUserInfo(HttpServletRequest request){
+        //User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //重构
+        String loginToken = CookieUtil.readLoginToken(request);
+        if (loginToken == null){
+            return ServerResponse.createByErrorMessage("用户未登录，不能获取用户信息");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = JsonUtil.string2Obj(userJsonStr, User.class);
+        //感觉重构麻烦了
         if (user != null)
             return ServerResponse.createBySuccess(user);
         return ServerResponse.createByErrorMessage("用户未登录，不能获取用户信息");
