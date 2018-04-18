@@ -1,5 +1,6 @@
 package seu.vczz.amall.controller.portal;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +14,6 @@ import seu.vczz.amall.service.IUserService;
 import seu.vczz.amall.util.CookieUtil;
 import seu.vczz.amall.util.JsonUtil;
 import seu.vczz.amall.util.RedisPoolUtil;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -52,7 +52,6 @@ public class UserController {
         }
         return serverResponse;
     }
-
     /**
      * 用户登出，只需要移除session即可
      * @param
@@ -71,7 +70,6 @@ public class UserController {
 
         return ServerResponse.createBySuccess();
     }
-
     /**
      * 用户注册
      * @param user
@@ -82,7 +80,6 @@ public class UserController {
     public ServerResponse<String> register(User user){
         return iUserService.register(user);
     }
-
     /**
      * 实时校验，应该是个异步提交，输入时候校验是否存在
      * 当最终提交的时候就是调用register方法
@@ -95,7 +92,6 @@ public class UserController {
     public ServerResponse<String> checkValid(String str, String type){
         return iUserService.checkValid(str, type);
     }
-
     /**
      * 获取用户信息
      * @param request 请求
@@ -117,7 +113,6 @@ public class UserController {
             return ServerResponse.createBySuccess(user);
         return ServerResponse.createByErrorMessage("用户未登录，不能获取用户信息");
     }
-
     /**
      * 获取密码提示问题
      * @param username
@@ -128,7 +123,6 @@ public class UserController {
     public ServerResponse<String> forgetGetQuestion(String username){
         return iUserService.selectQuestion(username);
     }
-
     /**
      * 验证问题答案，如果正确了，返回前端一个token，作为重改密码的有效期
      * @param username
@@ -141,7 +135,6 @@ public class UserController {
     public ServerResponse<String> forgetCheckAnswer(String username, String question, String answer){
         return iUserService.forgetCheckAnswer(username, question, answer);
     }
-
     /**
      * 忘记密码之重置密码
      * @param username
@@ -154,33 +147,54 @@ public class UserController {
     public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken){
         return iUserService.forgetResetPassword(username, passwordNew, forgetToken);
     }
-
     /**
      * 登录状态重置密码
-     * @param session
+     * @param request
      * @param passwordOld
      * @param passwordNew
      * @return
      */
     @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> resetPassword(HttpSession session, String passwordOld, String passwordNew){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<String> resetPassword(HttpServletRequest request, String passwordOld, String passwordNew){
+        //重构
+        //拿到loginToken
+        String loginToken = CookieUtil.readLoginToken(request);
+        //判断cookie 是否为空
+        if (StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,不能重置密码");
+        }
+        //拿到用户信息
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        //转user
+        User user = JsonUtil.string2Obj(userJsonStr, User.class);
+        //User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null)
-            return ServerResponse.createByErrorMessage("还未登录");
+            return ServerResponse.createByErrorMessage("登录已过期，请重新登录");
         return iUserService.resetPassword(passwordOld, passwordNew, user);
     }
-
     /**
      * 更新用户信息
-     * @param session
+     * @param request
      * @param user 上传的user
      * @return
      */
     @RequestMapping(value = "update_information.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> updateInformation(HttpSession session, User user){
-        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<User> updateInformation(HttpServletRequest request, User user){
+        //User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        //重构
+        //拿到loginToken
+        String loginToken = CookieUtil.readLoginToken(request);
+        //判断cookie 是否为空
+        if (StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,不能更新信息");
+        }
+        //拿到用户信息
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        //转user
+        User currentUser = JsonUtil.string2Obj(userJsonStr, User.class);
+
         if (currentUser == null){
             return ServerResponse.createByErrorMessage("还未登录");
         }
@@ -188,39 +202,39 @@ public class UserController {
         user.setUsername(currentUser.getUsername());
         ServerResponse<User> serverResponse = iUserService.updateInformation(user);
         //如果更新成功,更新当前用户
-        if (serverResponse.isSuccess())
+        if (serverResponse.isSuccess()){
             //少了这一句
             serverResponse.getData().setUsername(currentUser.getUsername());
-            session.setAttribute(Const.CURRENT_USER, serverResponse.getData());
+            //session.setAttribute(Const.CURRENT_USER, serverResponse.getData());
+            RedisPoolUtil.setEx(loginToken, JsonUtil.obj2String(serverResponse.getData()), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+
+        }
         return serverResponse;
     }
-
     /**
      * 获取用户信息
-     * @param session
+     * @param request
      * @return
      */
     @RequestMapping(value = "get_information.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> getInformation(HttpSession session){
-        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
-        if (currentUser == null){
+    public ServerResponse<User> getInformation(HttpServletRequest request){
+        //User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        //重构
+        //拿到loginToken
+        String loginToken = CookieUtil.readLoginToken(request);
+        //判断cookie 是否为空
+        if (StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,不能获取用户信息");
+        }
+        //拿到用户信息
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        //转user
+        User user = JsonUtil.string2Obj(userJsonStr, User.class);
+
+        if (user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "未登录，请登录");
         }
-        return iUserService.getInformation(currentUser.getId());
+        return iUserService.getInformation(user.getId());
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

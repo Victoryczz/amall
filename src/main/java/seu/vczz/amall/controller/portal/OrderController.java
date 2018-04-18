@@ -4,6 +4,7 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.demo.trade.config.Configs;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,10 @@ import seu.vczz.amall.common.ResponseCode;
 import seu.vczz.amall.common.ServerResponse;
 import seu.vczz.amall.pojo.User;
 import seu.vczz.amall.service.IOrderService;
-
+import seu.vczz.amall.util.CookieUtil;
+import seu.vczz.amall.util.JsonUtil;
+import seu.vczz.amall.util.RedisPoolUtil;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -38,15 +40,26 @@ public class OrderController {
 
     /**
      * 创建订单，当提交订单时，会选择地址，此时将地址id传过来就可以获取其他信息
-     * @param session
+     * @param request
      * @param shippingId
      * @return
      */
     @RequestMapping("create.do")
     @ResponseBody
-    public ServerResponse create(HttpSession session, Integer shippingId){
+    public ServerResponse create(HttpServletRequest request, Integer shippingId){
         //用户校验
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //重构
+        //拿到loginToken
+        String loginToken = CookieUtil.readLoginToken(request);
+        //判断cookie 是否为空
+        if (StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,不能创建订单");
+        }
+        //拿到用户信息
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        //转user
+        User user = JsonUtil.string2Obj(userJsonStr, User.class);
         if (user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
@@ -55,14 +68,26 @@ public class OrderController {
 
     /**
      * 取消订单，只需要提价订单号即可
-     * @param session
+     * @param request
      * @param orderNo
      * @return
      */
     @RequestMapping("cancel.do")
     @ResponseBody
-    public ServerResponse cancel(HttpSession session, Long orderNo){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse cancel(HttpServletRequest request, Long orderNo){
+        //User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //重构
+        //拿到loginToken
+        String loginToken = CookieUtil.readLoginToken(request);
+        //判断cookie 是否为空
+        if (StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,不能取消订单");
+        }
+        //拿到用户信息
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        //转user
+        User user = JsonUtil.string2Obj(userJsonStr, User.class);
+
         if (user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
@@ -71,13 +96,24 @@ public class OrderController {
 
     /**
      * 应该是提交订单前的一页，展示你要买的哪些东西，但是此时只是从购物车转到了提交页面，真正的订单还没有创建，相当于淘宝点了结算还没提交订单
-     * @param session
+     * @param request
      * @return
      */
     @RequestMapping("get_cart_order_product.do")
     @ResponseBody
-    public ServerResponse getOrderCartProduct(HttpSession session){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse getOrderCartProduct(HttpServletRequest request){
+        //User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //重构
+        //拿到loginToken
+        String loginToken = CookieUtil.readLoginToken(request);
+        //判断cookie 是否为空
+        if (StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,不能获取购物车商品");
+        }
+        //拿到用户信息
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        //转user
+        User user = JsonUtil.string2Obj(userJsonStr, User.class);
         if (user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
@@ -86,14 +122,26 @@ public class OrderController {
 
     /**
      * 获取订单详情，只需要传入订单号即可
-     * @param session
+     * @param request
      * @param orderNo
      * @return
      */
     @RequestMapping("get_order_detail.do")
     @ResponseBody
-    public ServerResponse getOrderDetail(HttpSession session, Long orderNo){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse getOrderDetail(HttpServletRequest request, Long orderNo){
+        //User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //重构
+        //拿到loginToken
+        String loginToken = CookieUtil.readLoginToken(request);
+        //判断cookie 是否为空
+        if (StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,不能获取订单详情");
+        }
+        //拿到用户信息
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        //转user
+        User user = JsonUtil.string2Obj(userJsonStr, User.class);
+
         if (user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
@@ -102,14 +150,26 @@ public class OrderController {
 
     /**
      * 获取订单列表,需要加上分页的逻辑
-     * @param session
+     * @param request
      * @return
      */
     @RequestMapping("list.do")
     @ResponseBody
-    public ServerResponse list(HttpSession session, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+    public ServerResponse list(HttpServletRequest request, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //重构
+        //拿到loginToken
+        String loginToken = CookieUtil.readLoginToken(request);
+        //判断cookie 是否为空
+        if (StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,不能查询订单列表");
+        }
+        //拿到用户信息
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        //转user
+        User user = JsonUtil.string2Obj(userJsonStr, User.class);
+
         if (user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
@@ -119,16 +179,28 @@ public class OrderController {
     /**************************************以下都是支付宝的对接************************************/
     /**
      * 支付，提交后需要向支付宝预下单，支付宝返回二维码，这里再返回给前端展示，之后用户扫码扫码付款
-     * @param session 判断用户登录状态
+     * @param request 判断用户登录状态
      * @param orderNo 订单号
      * @param request 获得路径
      * @return
      */
     @RequestMapping("pay.do")
     @ResponseBody
-    public ServerResponse pay(HttpSession session, Long orderNo, HttpServletRequest request){
+    public ServerResponse pay(Long orderNo, HttpServletRequest request){
         //检查用户状态
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //重构
+        //拿到loginToken
+        String loginToken = CookieUtil.readLoginToken(request);
+        //判断cookie 是否为空
+        if (StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,不能支付");
+        }
+        //拿到用户信息
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        //转user
+        User user = JsonUtil.string2Obj(userJsonStr, User.class);
+
         if (user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
@@ -188,14 +260,26 @@ public class OrderController {
 
     /**
      * 通过userId和orderNo查询订单的状态
-     * @param session
+     * @param request
      * @param orderNo
      * @return
      */
     @RequestMapping(value = "query_order_pay_status.do")
     @ResponseBody
-    public ServerResponse<Boolean> queryOrderPayStatus(HttpSession session, Long orderNo){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<Boolean> queryOrderPayStatus(HttpServletRequest request, Long orderNo){
+        //User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //重构
+        //拿到loginToken
+        String loginToken = CookieUtil.readLoginToken(request);
+        //判断cookie 是否为空
+        if (StringUtils.isEmpty(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录,不能请求订单支付状态");
+        }
+        //拿到用户信息
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        //转user
+        User user = JsonUtil.string2Obj(userJsonStr, User.class);
+
         if (user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
