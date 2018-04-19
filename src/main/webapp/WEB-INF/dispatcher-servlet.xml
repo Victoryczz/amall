@@ -8,7 +8,10 @@
 	http://www.springframework.org/schema/mvc
 	http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="seu.vczz.amall" annotation-config="true"/>
+    <!--springMVC就只管扫描controller注解-->
+    <context:component-scan base-package="seu.vczz.amall.controller" annotation-config="true" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
     <!--第一个bean是当@ResponseBody返回有中文时的处理，第二个为返回时类型的处理，根据返回的类型转换为响应的类型-->
     <mvc:annotation-driven>
         <mvc:message-converters>

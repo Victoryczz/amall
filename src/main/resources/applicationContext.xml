@@ -8,8 +8,10 @@
      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
-
-    <context:component-scan base-package="seu.vczz.amall" annotation-config="true"/>
+    <!--修改包扫描，如controller等应该是交给spring MVC来搞定，而不需要spring进行-->
+    <context:component-scan base-package="seu.vczz.amall" annotation-config="true">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
 
     <!--<context:annotation-config/>-->
     <aop:aspectj-autoproxy/>

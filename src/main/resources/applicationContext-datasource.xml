@@ -9,7 +9,7 @@
      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-    <context:component-scan base-package="seu.vczz.amall" annotation-config="true"/>
+
     <!--这个就是解决配置文件路径的问题，但是似乎没有能够解决，所以在application中添加了一个东西-->
     <bean id="propertyConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -81,12 +81,12 @@
     </bean>
 
     <!-- 使用@Transactional进行声明式事务管理需要声明下面这行 -->
-    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
-    <!-- 事务管理 -->
+    <!--<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+    &lt;!&ndash; 事务管理 &ndash;&gt;
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
         <property name="rollbackOnCommitFailure" value="true"/>
-    </bean>
+    </bean>-->
 
 
 </beans>
