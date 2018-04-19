@@ -38,8 +38,10 @@ public class UserServiceImpl implements IUserService{
         //如果用户名存在，将密码使用MD5加密然后对比
         String MD5Password = MD5Util.MD5EncodeUtf8(password);
         User user = userMapper.selectLogin(username, MD5Password);
-        if (user == null)
+        if (user == null){
             return ServerResponse.createByErrorMessage("密码错误");
+        }
+
         //如果获得了用户，那么就将用户密码置空，然后返回
         user.setPassword(StringUtils.EMPTY);
         //返回json序列化,此时已经返回了user，所以也拿到了userId
