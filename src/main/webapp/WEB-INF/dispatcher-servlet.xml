@@ -42,5 +42,23 @@
         <property name="defaultEncoding" value="UTF-8"></property>
     </bean>
 
+    <!--拦截器实现权限管理-->
+    <mvc:interceptors>
+        <!--如果bean定义在根节点下，则该bean会拦截所有的请求-->
+
+        <mvc:interceptor>
+            <!--/manage/login.do   path=/manage/*-->
+            <!--/manage/lo.do      path=/manage/*-->
+            <!--/manage/user/b.do     path=/manage/**-->
+            <!--/manage/order/d.do     path=/manage/**-->
+            <mvc:mapping path="/manage/**"/>
+            <!--&lt;!&ndash;不拦截登录请求&ndash;&gt;
+            <mvc:exclude-mapping path="/manage/user/login.do"/>-->
+            <bean class="seu.vczz.amall.controller.common.interceptor.AuthorityInterceptor"/>
+        </mvc:interceptor>
+
+    </mvc:interceptors>
+
+
 
 </beans>
