@@ -34,20 +34,19 @@ public class OrderManageController {
 
     /**
      * 获得订单列表
-     * @param request
      * @param pageNum
      * @param pageSize
      * @return
      */
     @RequestMapping(value = "list.do")
     @ResponseBody
-    public ServerResponse orderList(HttpServletRequest request, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+    public ServerResponse orderList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                     @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
         //查看是否具有管理员权限，之后会使用springMVC进行统一的权限拦截
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能获取订单列表");
@@ -63,24 +62,24 @@ public class OrderManageController {
         if (!iUserService.checkAdminRole(user).isSuccess()){
             return ServerResponse.createByErrorMessage("该用户没有管理员权限");
         }
+        return iOrderService.getManageOrderList(pageNum, pageSize);*/
+        //权限交给拦截器
         return iOrderService.getManageOrderList(pageNum, pageSize);
-
     }
 
     /**
      * 后台获取订单详情
-     * @param request
      * @param orderNo
      * @return
      */
     @RequestMapping(value = "detail.do")
     @ResponseBody
-    public ServerResponse orderDetail(HttpServletRequest request, Long orderNo){
+    public ServerResponse orderDetail(Long orderNo){
         //查看是否具有管理员权限，之后会使用springMVC进行统一的权限拦截
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能获取订单详情");
@@ -95,13 +94,16 @@ public class OrderManageController {
         }
         if (!iUserService.checkAdminRole(user).isSuccess()){
             return ServerResponse.createByErrorMessage("该用户没有管理员权限");
-        }
+        }*/
+
+        //权限交给拦截器
         return iOrderService.getManageOrderDetail(orderNo);
+
+
     }
 
     /**
      * 查找订单，当前只用了精确查找，且分页
-     * @param request
      * @param orderNo
      * @param pageNum
      * @param pageSize
@@ -109,13 +111,13 @@ public class OrderManageController {
      */
     @RequestMapping(value = "search.do")
     @ResponseBody
-    public ServerResponse orderSearch(HttpServletRequest request, Long orderNo, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+    public ServerResponse orderSearch(Long orderNo, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                       @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
         //查看是否具有管理员权限，之后会使用springMVC进行统一的权限拦截
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能搜寻订单");
@@ -131,23 +133,24 @@ public class OrderManageController {
         if (!iUserService.checkAdminRole(user).isSuccess()){
             return ServerResponse.createByErrorMessage("该用户没有管理员权限");
         }
+        return iOrderService.searchOrder(orderNo, pageNum, pageSize);*/
+        //权限交给拦截器
         return iOrderService.searchOrder(orderNo, pageNum, pageSize);
     }
 
     /**
      * 后台发货
-     * @param request
      * @param orderNo
      * @return
      */
     @RequestMapping(value = "sendGoods.do")
     @ResponseBody
-    public ServerResponse sendGoods(HttpServletRequest request, Long orderNo){
+    public ServerResponse sendGoods(Long orderNo){
         //查看是否具有管理员权限，之后会使用springMVC进行统一的权限拦截
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能发货");
@@ -162,7 +165,8 @@ public class OrderManageController {
         }
         if (!iUserService.checkAdminRole(user).isSuccess()){
             return ServerResponse.createByErrorMessage("该用户没有管理员权限");
-        }
+        }*/
+        //权限交给拦截器
         return iOrderService.sendGoods(orderNo);
     }
 

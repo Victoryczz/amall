@@ -20,8 +20,8 @@
 
     <!--引入数据库连接池文件-->
     <import resource="applicationContext-datasource.xml"/>
-    <!--引入spring session的配置文件-->
-    <import resource="applicationContext-spring-session.xml"/>
+    <!--&lt;!&ndash;引入spring session的配置文件&ndash;&gt;
+    <import resource="applicationContext-spring-session.xml"/>-->
 
 
 </beans>

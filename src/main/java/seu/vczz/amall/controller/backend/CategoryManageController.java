@@ -32,19 +32,18 @@ public class CategoryManageController {
 
     /**
      * 先校验用户权限，然后添加分类
-     * @param request
      * @param categoryName
      * @param parentId
      * @return
      */
     @RequestMapping(value = "add_category.do")
     @ResponseBody
-    public ServerResponse addCategory(HttpServletRequest request, String categoryName, @RequestParam(value = "parentId", defaultValue = "0")int parentId){
+    public ServerResponse addCategory(String categoryName, @RequestParam(value = "parentId", defaultValue = "0")int parentId){
         //先判断用户是否为空
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能添加分类");
@@ -62,23 +61,24 @@ public class CategoryManageController {
             return iCategoryService.addCategory(categoryName, parentId);
         }else {
             return ServerResponse.createByErrorMessage("该用户没有权限");
-        }
+        }*/
+        //权限操作全部交给拦截器
+        return iCategoryService.addCategory(categoryName, parentId);
     }
 
     /**
      * 更新分类名称,此处是传进去的id，我绝得是前端控制id，因为后台查到分类之后是由id的，当你编辑时将id传进来即可，不会导致id出错
-     * @param request
      * @param categoryId
      * @param categoryName
      * @return
      */
     @RequestMapping(value = "set_categoryName.do")
     @ResponseBody
-    public ServerResponse setCategoryName(HttpServletRequest request, Integer categoryId, String categoryName){
+    public ServerResponse setCategoryName(Integer categoryId, String categoryName){
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能修改分类名称");
@@ -95,23 +95,24 @@ public class CategoryManageController {
             return iCategoryService.updateCategoryName(categoryId, categoryName);
         }else {
             return ServerResponse.createByErrorMessage("没有权限");
-        }
+        }*/
+        //权限操作交给拦截器
+        return iCategoryService.updateCategoryName(categoryId, categoryName);
 
     }
 
     /**
      * 获取子节点平级的category
-     * @param request
      * @param categoryId
      * @return
      */
     @RequestMapping(value = "get_category.do")
     @ResponseBody
-    public ServerResponse getChildrenParallelCategory(HttpServletRequest request, @RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId){
+    public ServerResponse getChildrenParallelCategory(@RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId){
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能获取子分类目录");
@@ -127,22 +128,23 @@ public class CategoryManageController {
             return iCategoryService.getChildrenParallelCategory(categoryId);
         }else {
             return ServerResponse.createByErrorMessage("没有权限");
-        }
+        }*/
+        //权限操作交给拦截器
+        return iCategoryService.getChildrenParallelCategory(categoryId);
     }
 
     /**
      * 获取递归子节点
-     * @param request
      * @param categoryId
      * @return
      */
     @RequestMapping(value = "get_deep_category.do")
     @ResponseBody
-    public ServerResponse getCategoryAndDeepChildCategory(HttpServletRequest request, @RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId){
+    public ServerResponse getCategoryAndDeepChildCategory(@RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId){
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能获取分类目录");
@@ -159,7 +161,9 @@ public class CategoryManageController {
             return iCategoryService.getCategoryAndChildrenById(categoryId);
         }else {
             return ServerResponse.createByErrorMessage("没有权限");
-        }
+        }*/
+        //权限操作交给拦截器
+        return iCategoryService.getCategoryAndChildrenById(categoryId);
     }
 
 

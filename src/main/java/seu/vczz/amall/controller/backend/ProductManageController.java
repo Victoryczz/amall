@@ -39,17 +39,16 @@ public class ProductManageController {
 
     /**
      * 保存产品，新增或者更新使用同一个接口
-     * @param request
      * @param product
      * @return
      */
     @RequestMapping(value = "save.do")
     @ResponseBody
-    public ServerResponse productSave(HttpServletRequest request, Product product){
+    public ServerResponse productSave(Product product){
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能新增产品");
@@ -66,23 +65,24 @@ public class ProductManageController {
             return iProductService.saveOrUpdateProduct(product);
         }else{
             return ServerResponse.createByErrorMessage("用户没有管理员权限");
-        }
+        }*/
+
+        return iProductService.saveOrUpdateProduct(product);
     }
 
     /**
      * 更新产品状态：上架或下架
-     * @param request
      * @param productId
      * @param status
      * @return
      */
     @RequestMapping(value = "set_sale_status.do")
     @ResponseBody
-    public ServerResponse setSaleStatus(HttpServletRequest request, Integer productId, Integer status){
+    public ServerResponse setSaleStatus(Integer productId, Integer status){
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能设置产品状态");
@@ -99,22 +99,23 @@ public class ProductManageController {
             return iProductService.setSaleStatus(productId, status);
         }else {
             return ServerResponse.createBySuccessMessage("当前用户没有权限");
-        }
+        }*/
+
+        return iProductService.setSaleStatus(productId, status);
     }
 
     /**
      * 获得产品详情
-     * @param request
      * @param productId
      * @return
      */
     @RequestMapping(value = "detail.do")
     @ResponseBody
-    public ServerResponse getDetail(HttpServletRequest request, Integer productId){
+    public ServerResponse getDetail(Integer productId){
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能获取产品详情");
@@ -132,23 +133,24 @@ public class ProductManageController {
         }else {
             return ServerResponse.createByErrorMessage("当前用户没有权限");
         }
+*/
+        return iProductService.manageProductDetail(productId);
     }
 
     /**
      * 获取产品列表
-     * @param request
      * @param pageNum  页码
      * @param pageSize 条数
      * @return
      */
     @RequestMapping(value = "list.do")
     @ResponseBody
-    public ServerResponse getList(HttpServletRequest request, @RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
+    public ServerResponse getList(@RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能获取产品列表");
@@ -165,12 +167,13 @@ public class ProductManageController {
             return iProductService.getProductList(pageNum, pageSize);
         }else {
             return ServerResponse.createByErrorMessage("当前用户没有权限");
-        }
+        }*/
+
+        return iProductService.getProductList(pageNum, pageSize);
     }
 
     /**
      * 搜索，通过产品名称或者产品ID
-     * @param request
      * @param productName
      * @param productId
      * @param pageNum
@@ -179,13 +182,13 @@ public class ProductManageController {
      */
     @RequestMapping(value = "search.do")
     @ResponseBody
-    public ServerResponse searchProduct(HttpServletRequest request, String productName, Integer productId,
+    public ServerResponse searchProduct(String productName, Integer productId,
                                         @RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
                                         @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能查找产品");
@@ -202,7 +205,9 @@ public class ProductManageController {
             return iProductService.searchProduct(productName, productId, pageNum, pageSize);
         }else {
             return ServerResponse.createByErrorMessage("当前用户没有权限");
-        }
+        }*/
+
+        return iProductService.searchProduct(productName, productId, pageNum, pageSize);
     }
 
     /**
@@ -217,7 +222,7 @@ public class ProductManageController {
         //User user = (User) session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
-        String loginToken = CookieUtil.readLoginToken(request);
+        /*String loginToken = CookieUtil.readLoginToken(request);
         //判断cookie 是否为空
         if (StringUtils.isEmpty(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录,不能上传文件");
@@ -243,7 +248,18 @@ public class ProductManageController {
             return ServerResponse.createBySuccess(fileMap);
         }else {
             return ServerResponse.createByErrorMessage("没有权限");
-        }
+        }*/
+        //权限拦截交给拦截器
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        //targetFileName是tomcat的绝对路径下的文件名，不是全名
+        String targetFileName = iFileService.upload(file, path);
+        //此处应是ftp下放置文件的位子
+        String url = PropertiesUtil.getProperty("ftp.server.http.prefix")+targetFileName;
+
+        Map fileMap = Maps.newHashMap();
+        fileMap.put("uri", targetFileName);
+        fileMap.put("url", url);
+        return ServerResponse.createBySuccess(fileMap);
 
     }
 
@@ -257,7 +273,7 @@ public class ProductManageController {
     @RequestMapping("richtext_img_upload.do")
     @ResponseBody
     public Map richTextImgUpload(@RequestParam(value = "upload_file",required = false) MultipartFile file, HttpServletRequest request, HttpServletResponse response){
-        Map resultMap = Maps.newHashMap();
+        /*Map resultMap = Maps.newHashMap();
         //User user = (User)session.getAttribute(Const.CURRENT_USER);
         //重构
         //拿到loginToken
@@ -302,7 +318,22 @@ public class ProductManageController {
             resultMap.put("success",false);
             resultMap.put("msg","无权限操作");
             return resultMap;
+        }*/
+        //权限拦截交给拦截器
+        Map resultMap = Maps.newHashMap();
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String targetFileName = iFileService.upload(file,path);
+        if(StringUtils.isBlank(targetFileName)){
+            resultMap.put("success",false);
+            resultMap.put("msg","上传失败");
+            return resultMap;
         }
+        String url = PropertiesUtil.getProperty("ftp.server.http.prefix")+targetFileName;
+        resultMap.put("success",true);
+        resultMap.put("msg","上传成功");
+        resultMap.put("file_path",url);
+        response.addHeader("Access-Control-Allow-Headers","X-File-Name");
+        return resultMap;
     }
 
 }

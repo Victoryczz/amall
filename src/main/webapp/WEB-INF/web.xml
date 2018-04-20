@@ -27,7 +27,7 @@
   </filter-mapping>
 
   <!--先注释掉，因为现在要使用spring session进行无侵入式session管理-->
-  <!--&lt;!&ndash;重新设置session时间,所有以.do结尾的请求都重新设置session时间&ndash;&gt;
+  <!--重新设置session时间,所有以.do结尾的请求都重新设置session时间-->
   <filter>
     <filter-name>sessionExpireFilter</filter-name>
     <filter-class>seu.vczz.amall.controller.common.SessionExpireFilter</filter-class>
@@ -35,17 +35,17 @@
   <filter-mapping>
     <filter-name>sessionExpireFilter</filter-name>
     <url-pattern>*.do</url-pattern>
-  </filter-mapping>-->
+  </filter-mapping>
 
   <!--spring session的filter-->
-  <filter>
+  <!--<filter>
     <filter-name>springSessionRepositoryFilter</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>springSessionRepositoryFilter</filter-name>
     <url-pattern>*.do</url-pattern>
-  </filter-mapping>
+  </filter-mapping>-->
   
   <!--继承自ServletRequestListener-->
   <listener>
