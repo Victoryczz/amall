@@ -1,5 +1,6 @@
 package seu.vczz.amall.controller.common.interceptor;
 
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.method.HandlerMethod;
@@ -81,9 +82,27 @@ public class AuthorityInterceptor implements HandlerInterceptor{
 
             PrintWriter out = response.getWriter();
             if (user == null){
-                out.print(JsonUtil.obj2String(ServerResponse.createByErrorMessage("拦截，用户未登录")));
+                //判断是不是拦截到了富文本上传,这是因为富文本有单独的返回类型
+                if (StringUtils.equals("ProductManageController", className)&&StringUtils.equals("richTextImgUpload", methodName)){
+                    log.info("拦截器拦截到富文本上传请求");
+                    Map resultMap = Maps.newHashMap();
+                    resultMap.put("success",false);
+                    resultMap.put("msg","请登录管理员");
+                    out.print(JsonUtil.obj2String(resultMap));
+                }else {
+                    out.print(JsonUtil.obj2String(ServerResponse.createByErrorMessage("拦截，用户未登录")));
+                }
             }else {
-                out.print(JsonUtil.obj2String(ServerResponse.createByErrorMessage("拦截，无权限")));
+                //判断是不是拦截到了富文本上传,这是因为富文本有单独的返回类型
+                if (StringUtils.equals("ProductManageController", className)&&StringUtils.equals("richTextImgUpload", methodName)){
+                    log.info("拦截器拦截到富文本上传请求");
+                    Map resultMap = Maps.newHashMap();
+                    resultMap.put("success",false);
+                    resultMap.put("msg","无权限操作");
+                    out.print(JsonUtil.obj2String(resultMap));
+                }else {
+                    out.print(JsonUtil.obj2String(ServerResponse.createByErrorMessage("拦截，无权限")));
+                }
             }
             out.flush();
             out.close();//关闭
