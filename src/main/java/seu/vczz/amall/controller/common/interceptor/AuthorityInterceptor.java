@@ -12,7 +12,6 @@ import seu.vczz.amall.pojo.User;
 import seu.vczz.amall.util.CookieUtil;
 import seu.vczz.amall.util.JsonUtil;
 import seu.vczz.amall.util.RedisShardedPoolUtil;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
@@ -62,7 +61,7 @@ public class AuthorityInterceptor implements HandlerInterceptor{
             //直接返回true
             return true;
         }
-        log.info("拦截到请求：{}", stringBuffer.toString());
+        log.info("拦截到请求，请求controller：{}, 方法名：{}, 参数：{}", className, methodName, stringBuffer.toString());
 
         //拿到获取用户的代码
         User user = null;
