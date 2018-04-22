@@ -103,4 +103,11 @@ public interface IOrderService {
      * @return
      */
     ServerResponse sendGoods(Long orderNo);
+
+    /**
+     * 定时关单，hour个小时未付款的订单需要关闭
+     * @param hour
+     */
+    void closeOrder(int hour);
+
 }

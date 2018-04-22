@@ -2,7 +2,6 @@ package seu.vczz.amall.dao;
 
 import org.apache.ibatis.annotations.Param;
 import seu.vczz.amall.pojo.Order;
-
 import java.util.List;
 
 public interface OrderMapper {
@@ -25,4 +24,9 @@ public interface OrderMapper {
     List<Order> selectOrderByUserId(Integer userId);
 
     List<Order> selectAllOrder();
+
+    //定时关单
+    List<Order> selectOrderStatusByCreateTime(@Param("status") Integer status, @Param("date") String date);
+
+    int closeOrderByOrderId(Integer orderId);
 }

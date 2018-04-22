@@ -14,9 +14,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sun.jmx.remote.util.OrderClassLoaders;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -440,6 +442,38 @@ public class OrderServiceImpl implements IOrderService {
         }
         return ServerResponse.createBySuccessMessage("订单未付款");
 
+    }
+
+    /**
+     * 定时关单，超过hour小时未付款的订单取消
+     * @param hour
+     */
+    public void closeOrder(int hour) {
+        //关单的时间,当前时间减去hour
+        Date closeDateTime = DateUtils.addHours(new Date(), -hour);
+        //然后需要根据时间查找符合条件的订单列表
+        List<Order> orderList = orderMapper.selectOrderStatusByCreateTime(Const.OrderStatusEnum.NO_PAY.getCode(),
+                                                                          DateTimeUtil.dateToStr(closeDateTime));
+        //遍历order，拿到orderItem，增加库存
+        for (Order order : orderList){
+            List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(order.getOrderNo());
+            for (OrderItem orderItem : orderItemList){
+                //获得产品的库存
+                Integer stock = productMapper.selectStockByProductId(orderItem.getProductId());
+                if (stock == null){
+                    //代表订单中的产品已经被删除了
+                    continue;
+                }
+                //重新写入数据库
+                Product product = new Product();
+                product.setId(orderItem.getProductId());
+                product.setStock(stock+orderItem.getQuantity());
+                productMapper.updateByPrimaryKeySelective(product);
+            }
+            //当前order取消之后，要关闭订单,设置订单状态为已取消
+            orderMapper.closeOrderByOrderId(order.getId());
+            log.info("关闭订单：{}", order.getOrderNo());
+        }
     }
 
 
