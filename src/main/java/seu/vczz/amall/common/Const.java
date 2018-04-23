@@ -157,6 +157,10 @@ public class Const {
         int REDIS_SESSION_EXTIME = 60*30;//30min
 
     }
+    //分布式锁
+    public interface RedisLock{
+        String CLOSE_ORDER_TASK_LOCK = "close_order_task_lock";
+    }
 
 
 

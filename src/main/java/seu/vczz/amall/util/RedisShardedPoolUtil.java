@@ -38,6 +38,31 @@ public class RedisShardedPoolUtil {
     }
 
     /**
+     * getSet方法，先获取，再设置，原子操作
+     * @param key
+     * @param value
+     * @return
+     */
+    public static String getSet(String key, String value){
+        //先是两个
+        ShardedJedis jedis = null;
+        String result = null;
+        //可能会报错，需要使用try catch
+        try {
+            jedis = RedisShardedPool.getResource();
+            result = jedis.getSet(key, value);
+        } catch (Exception e) {
+            //打印错误信息
+            log.error("getSet key:{} value:{} error", key, value, e);
+            RedisShardedPool.returnBrokenResource(jedis);
+            return result;
+        }
+        //正常处理
+        RedisShardedPool.returnResource(jedis);
+        return result;
+    }
+
+    /**
      * redis的set方法，使用带有设置有效期的方法
      * @param key
      * @param value
@@ -126,6 +151,32 @@ public class RedisShardedPoolUtil {
         } catch (Exception e) {
             //打印错误信息
             log.error("del key:{} error", key, e);
+            RedisShardedPool.returnBrokenResource(jedis);
+            return result;
+        }
+        //正常处理
+        RedisShardedPool.returnResource(jedis);
+        return result;
+    }
+
+    /**
+     * 如果不存在则添加
+     * @param key
+     * @param value
+     * @return
+     */
+    public static Long setNx(String key, String value){
+        //先是两个
+        ShardedJedis jedis = null;
+        Long result = null;
+        //可能会报错，需要使用try catch
+        try {
+            jedis = RedisShardedPool.getResource();
+            result = jedis.setnx(key, value);
+            log.info("setnx key:{} value:{} ", key, value);
+        } catch (Exception e) {
+            //打印错误信息
+            log.error("setnx key:{} value:{} error", key, value, e);
             RedisShardedPool.returnBrokenResource(jedis);
             return result;
         }
