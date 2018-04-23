@@ -2,15 +2,19 @@ package seu.vczz.amall.task;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import seu.vczz.amall.common.Const;
+import seu.vczz.amall.common.RedissonManager;
 import seu.vczz.amall.service.IOrderService;
 import seu.vczz.amall.util.PropertiesUtil;
 import seu.vczz.amall.util.RedisShardedPoolUtil;
+import sun.util.resources.cldr.vai.LocaleNames_vai;
 
 import java.util.concurrent.TimeUnit;
+
 
 /**
  * CREATE by vczz on 2018/4/21
@@ -22,6 +26,9 @@ public class CloseOrderTask {
     //定时关单
     @Autowired
     private IOrderService iOrderService;
+    @Autowired
+    private RedissonManager redissonManager;
+
     /**
      * 定时关单v1版本，该版本不需要分布式锁，也就是
      * 如果集群中多个任务同时关单就可能发生数据错误了，
@@ -65,13 +72,13 @@ public class CloseOrderTask {
         iOrderService.closeOrder(hour);
         //订单关闭完成后释放锁
         RedisShardedPoolUtil.del(Const.RedisLock.CLOSE_ORDER_TASK_LOCK);
-        log.info("释放：{}，ThreadName：{}", Const.RedisLock.CLOSE_ORDER_TASK_LOCK, Thread.currentThread());
+        log.info("释放：{}，ThreadName：{}", Const.RedisLock.CLOSE_ORDER_TASK_LOCK, Thread.currentThread().getName());
         log.info("-----------------------------------");
     }
     /**
      * 分布式锁v3版本，v2的优化版本
      */
-    @Scheduled(cron = "0 0 */1 * * ?")
+    //@Scheduled(cron = "0 0 */1 * * ?")
     public void closeOrderTaskV3(){
         log.info("关闭订单任务启动");
         //分布式锁的超时时间
@@ -104,5 +111,36 @@ public class CloseOrderTask {
 
         }
         log.info("关闭订单任务结束");
+    }
+
+    /**
+     * 分布式锁的v4版本，使用Redisson实现
+     */
+    @Scheduled(cron = "0 */1 * * * ?")
+    public void closeOrderTaskV4(){
+        //实例化一个可重入锁
+        RLock rLock = redissonManager.getRedisson().getLock(Const.RedisLock.CLOSE_ORDER_TASK_LOCK);
+        //尝试获取锁的结果
+        boolean getLock = false;
+        try {
+            //获取锁最大等待时间为0s(实际中最好就使用0s，否则可能多个线程获得锁（一次只有一个），执行多次任务)，锁的超时时间为5s
+            if (getLock = rLock.tryLock(0,30, TimeUnit.SECONDS)){
+                log.info("Redisson获取分布式锁:{},ThreadName:{}", Const.RedisLock.CLOSE_ORDER_TASK_LOCK, Thread.currentThread().getName());
+                //执行业务
+                int hour = Integer.parseInt(PropertiesUtil.getProperty("close.order.task.time.hour", "2"));
+                //测试，先不执行业务
+                //iOrderService.closeOrder(hour);
+            }else {
+                log.error("Redisson获取分布式锁失败:{},ThreadName:{}", Const.RedisLock.CLOSE_ORDER_TASK_LOCK, Thread.currentThread().getName());
+            }
+        } catch (InterruptedException e) {
+            log.error("Redisson获取分布式锁异常:{},ThreadName:{}", Const.RedisLock.CLOSE_ORDER_TASK_LOCK, Thread.currentThread().getName(), e);
+        }finally {
+            if (!getLock){
+                return;
+            }
+            rLock.unlock();
+            log.info("Redisson分布式锁：{}释放", Const.RedisLock.CLOSE_ORDER_TASK_LOCK);
+        }
     }
 }
